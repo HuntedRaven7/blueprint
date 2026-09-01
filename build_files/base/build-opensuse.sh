@@ -4,8 +4,9 @@ set -ouex pipefail
 cp -avf "/ctx/system_files/global"/. /
 cp -avf "/ctx/system_files/opensuse"/. /
 
-zypper refresh
+zypper dup -y
 zypper install -y \
+    patterns-base-base \
     kernel-default \
     kernel-firmware-all \
     systemd \
@@ -57,7 +58,7 @@ ln -sT var/opt /opt
 ln -sT var/home /home
 ln -sT ../var/usrlocal /usr/local
 
-cp -rv /usr/etc/* /etc
+cp -rv --update=none /usr/etc/* /etc
 rm -r /usr/etc
 
 KVER=$(basename "$(find /usr/lib/modules -maxdepth 1 -mindepth 1 -type d | tail -n 1)")
