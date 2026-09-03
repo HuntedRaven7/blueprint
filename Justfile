@@ -240,6 +240,8 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
                 _base="arch-bootc:stable"; _sys="holo"; _b="holo/builder-holo-amd.sh"; _s="holo/build-amd.sh" ;;
             holo-nvidia)
                 _base="arch-bootc:stable"; _sys="holo"; _b="holo/builder-holo-nvidia.sh"; _s="holo/build-nvidia.sh" ;;
+            robin)
+                _base="ghcr.io/huntedraven7/arch-bootc:testing"; _sys="robin"; _b="builder-robin.sh"; _s="build-robin.sh" ;;
         esac
         BUILD_ARGS+=("--build-arg" "VARIANT=${_sys}")
         BUILD_ARGS+=("--build-arg" "BASE_IMAGE=${_base}")
