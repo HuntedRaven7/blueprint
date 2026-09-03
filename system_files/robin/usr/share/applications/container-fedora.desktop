@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Open Fedora Container
+Exec=/usr/bin/container-launch fedora
+Icon=applications-terminal
+NoDisplay=true
+X-KDE-Shortcuts=Ctrl+Alt+F

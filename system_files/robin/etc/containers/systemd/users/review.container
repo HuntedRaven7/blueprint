@@ -1,0 +1,13 @@
+[Unit]
+Description=Ephemeral Review container
+Documentation=man:podman-systemd.unit(5)
+
+[Container]
+Image=ghcr.io/huntedraven7/review:latest
+ContainerName=review
+Exec=/usr/bin/sleep infinity
+HostName=review
+PodmanArgs=--memory=512m --cpus=0.5
+
+[Service]
+TimeoutStartSec=900

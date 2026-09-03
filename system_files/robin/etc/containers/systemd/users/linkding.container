@@ -1,0 +1,13 @@
+[Unit]
+Description=Ephemeral Linkding container
+Documentation=man:podman-systemd.unit(5)
+
+[Container]
+Image=docker.io/sbrunett/linkding:latest
+ContainerName=linkding
+Exec=/usr/bin/sleep infinity
+HostName=linkding
+PodmanArgs=--memory=512m --cpus=0.5
+
+[Service]
+TimeoutStartSec=900

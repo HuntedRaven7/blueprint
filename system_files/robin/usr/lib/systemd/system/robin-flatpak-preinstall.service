@@ -1,0 +1,16 @@
+[Unit]
+Description=Install Flatpaks from /usr/share/flatpak/preinstall.d
+Documentation=https://github.com/huntedraven7/blueprint
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/usr/share/flatpak/preinstall.d
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/robin-flatpak-preinstall
+TimeoutStartSec=30min
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

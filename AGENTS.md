@@ -13,7 +13,7 @@ links lives in `.agents/skills/README.md`.
 `blueprint` is a **personal, multi-image bootc builder** owned by
 `huntedraven7`. It is not a fork-this-template project: there is one repository
 that builds a set of image variants — `arch`, `debian`, `ubuntu`, `opensuse`,
-`gentoo`, `nixos`, `holo-amd`, `holo-nvidia` (all from a single unified root
+`gentoo`, `nixos`, `robin`, `holo-amd`, `holo-nvidia` (all from a single unified root
 `Containerfile`, with identity inlined in the `Justfile` `build` recipe `case`
 arms) plus `fsdk` (built with BuildStream) — and three promoted base images
 (`arch-bootc`, `debian-bootc`, `opensuse-bootc`). The `Justfile` is the single
@@ -29,7 +29,7 @@ build entrypoint.
   digest as `:stable`.
 - Variant images publish under their own tag on
   `ghcr.io/huntedraven7/blueprint` (`:arch`, `:debian`, `:ubuntu`, `:opensuse`,
-  `:gentoo`, `:nixos`, `:holo-amd`, `:holo-nvidia`, `:fsdk`) plus
+  `:gentoo`, `:nixos`, `:robin`, `:holo-amd`, `:holo-nvidia`, `:fsdk`) plus
   `-<date>` / `-<sha>` alias tags.
 - Base images publish under their own repository:
   `ghcr.io/huntedraven7/arch-bootc`, `debian-bootc`, `opensuse-bootc`.
@@ -58,8 +58,8 @@ Base images (`arch`, `debian`, `opensuse`) use a digest-pin promotion:
 | `blueprint`                             | `:<variant>` | The variant's current build                  |
 
 Downstream variants consume the promoted base: `holo-amd` / `holo-nvidia`
-build `FROM arch-bootc:stable`. Promoting a broken base breaks every downstream
-variant, so step 2 is not optional.
+build `FROM arch-bootc:stable`. `robin` builds `FROM arch-bootc:testing`.
+Promoting a broken base breaks every downstream variant, so step 2 is not optional.
 
 ## CRITICAL: External Repository Research
 
@@ -121,7 +121,7 @@ do not hand-write them.
 9. **ALWAYS** copy `system_files/global` **before** the per-variant overlay so variant files win
 10. **ALWAYS** let Renovate bump pinned digests (`image-versions.yaml`, action SHAs); do not hand-edit them
 11. **NEVER** hand-edit a promoted `:stable` digest in `image-versions.yaml` — use `promote-<base>.yml`
-12. **ALWAYS** test a base image's `:testing` tag before promoting it to `:stable`; `holo-amd`/`holo-nvidia` build `FROM arch-bootc:stable`
+12. **ALWAYS** test a base image's `:testing` tag before promoting it to `:stable`; `holo-amd`/`holo-nvidia` build `FROM arch-bootc:stable`, `robin` builds `FROM arch-bootc:testing`
 13. **ALWAYS** keep `RUN bootc container lint` in Containerfiles that already have it
 14. **NEVER** modify `.github/workflows/*` without running `actionlint` and considering `zizmor.yml`
 15. **ALWAYS** confirm with the user before deviating from upstream @ublue-os / @projectbluefin patterns
@@ -163,6 +163,6 @@ Before marking work done:
 - [ ] Updated or created the relevant skill file?
 - [ ] Included that learning in this PR?
 
-**Last Updated**: 2026-08-19
+**Last Updated**: 2026-09-03
 **Repository**: huntedraven7/blueprint (personal multi-image bootc builder)
 **Maintainer**: huntedraven7

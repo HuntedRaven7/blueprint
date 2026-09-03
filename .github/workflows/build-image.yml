@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [arch, debian, opensuse, nixos, ubuntu, holo-amd, holo-nvidia, fsdk]
+        variant: [arch, debian, opensuse, nixos, ubuntu, holo-amd, holo-nvidia, fsdk, robin]
 
     steps:
       - name: Prepare environment

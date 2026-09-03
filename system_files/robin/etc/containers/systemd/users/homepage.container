@@ -1,0 +1,13 @@
+[Unit]
+Description=Ephemeral Homepage container
+Documentation=man:podman-systemd.unit(5)
+
+[Container]
+Image=docker.io/ghcr.io/huntedraven7/homepage:latest
+ContainerName=homepage
+Exec=/usr/bin/sleep infinity
+HostName=homepage
+PodmanArgs=--memory=512m --cpus=0.5
+
+[Service]
+TimeoutStartSec=900

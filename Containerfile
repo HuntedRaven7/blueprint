@@ -1,5 +1,5 @@
 # Unified Containerfile for the "other" blueprint images:
-#   arch, debian, ubuntu, opensuse, gentoo, nixos, holo-amd, holo-nvidia
+#   arch, debian, ubuntu, opensuse, gentoo, nixos, holo-amd, holo-nvidia, robin
 #
 # robin, aira, server, crmy, ai keep their own containerfiles/Containerfile.<variant>.
 #

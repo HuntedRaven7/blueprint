@@ -186,6 +186,15 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
             REPO_ORGANIZATION="huntedraven7"
             BIB_IMAGE="quay.io/centos-bootc/bootc-image-builder:latest"
             ;;
+        robin*)
+            IMAGE_NAME="robin"
+            DEFAULT_TAG="testing"
+            IMAGE_DESC="Arch Linux Niri + Quickshell Desktop"
+            IMAGE_KEYWORDS="bootc,oci,linux,arch,niri,quickshell,wayland"
+            IMAGE_LOGO_URL="https://avatars.githubusercontent.com/u/120078124?s=200&v=4"
+            REPO_ORGANIZATION="huntedraven7"
+            BIB_IMAGE="quay.io/centos-bootc/bootc-image-builder:latest"
+            ;;
         *)
             echo "Unknown variant: '${target_image}'. No inline identity and no env file." >&2
             exit 1
@@ -314,9 +323,9 @@ build-all:
     just build holo-amd
     just build holo-nvidia
     just build-fsdk
+    just build-containerfile robin
     just build-containerfile server
     just build-containerfile aira
-    just build-containerfile robin
     just build-containerfile ai
 
 # Build an image then rechunk it for smaller bootc delta updates
@@ -481,10 +490,10 @@ variant-env $target_image=image_name:
         ubuntu*)      IMAGE_NAME="ubuntu-bootc"; DEFAULT_TAG="testing" ;;
         holo-amd*)    IMAGE_NAME="blueprint";    DEFAULT_TAG="holo-amd" ;;
         holo-nvidia*) IMAGE_NAME="blueprint";    DEFAULT_TAG="holo-nvidia" ;;
+        robin*)       IMAGE_NAME="robin";        DEFAULT_TAG="testing" ;;
         fsdk*)        IMAGE_NAME="blueprint";    DEFAULT_TAG="fsdk" ;;
         server*)      IMAGE_NAME="server";       DEFAULT_TAG="testing" ;;
         aira*)        IMAGE_NAME="aira";         DEFAULT_TAG="testing" ;;
-        robin*)      IMAGE_NAME="robin";       DEFAULT_TAG="testing" ;;
         ai*)          IMAGE_NAME="ai";           DEFAULT_TAG="testing" ;;
         *)
             echo "Unknown variant: '${target_image}'" >&2

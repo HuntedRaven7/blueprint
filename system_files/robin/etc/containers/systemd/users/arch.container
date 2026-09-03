@@ -1,0 +1,13 @@
+[Unit]
+Description=Ephemeral Arch Linux container
+Documentation=man:podman-systemd.unit(5)
+
+[Container]
+Image=docker.io/library/archlinux:latest@sha256:4bf33b21a715aac0b48ce6e9eaed4782a898eae96f88f5da3635572129c2584a
+ContainerName=arch
+Exec=/usr/bin/sleep infinity
+HostName=arch
+PodmanArgs=--memory=512m --cpus=0.5
+
+[Service]
+TimeoutStartSec=900

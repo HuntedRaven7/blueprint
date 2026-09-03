@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+###############################################################################
+# Robin Flatpak Preinstall — consume /usr/share/flatpak/preinstall.d entries
+###############################################################################
+# Installs flatpaks defined in *.preinstall files on first boot.
+# Format per file:
+#
+#   [Flatpak Preinstall com.example.App]
+#   Branch=stable
+#
+# Installs each app into the system installation, skipping failures so one
+# bad entry never blocks the rest.
+###############################################################################
+
+PREINSTALL_DIR="/usr/share/flatpak/preinstall.d"
+REMOTE="flathub"
+
+command -v flatpak >/dev/null 2>&1 || exit 0
+[[ -d "${PREINSTALL_DIR}" ]] || exit 0
+
+shopt -s nullglob
+PREINSTALL_FILES=("${PREINSTALL_DIR}"/*.preinstall)
+shopt -u nullglob
+[[ ${#PREINSTALL_FILES[@]} -gt 0 ]] || exit 0
+
+if ! flatpak remotes --system 2>/dev/null | awk '{print $1}' | grep -qx "${REMOTE}"; then
+	flatpak remote-add --system --if-not-exists "${REMOTE}" \
+		https://dl.flathub.org/repo/flathub.flatpakrepo
+fi
+
+parse_preinstall() {
+	local file app="" branch="stable" line
+	for file in "${PREINSTALL_FILES[@]}"; do
+		app=""
+		branch="stable"
+		while IFS= read -r line || [[ -n "${line}" ]]; do
+			case "${line}" in
+				"[Flatpak Preinstall "*"]")
+					if [[ -n "${app}" ]]; then
+						printf '%s %s\n' "${app}" "${branch}"
+					fi
+					app="${line#\[Flatpak Preinstall }"
+					app="${app%\]}"
+					branch="stable"
+					;;
+				Branch=*)
+					branch="${line#Branch=}"
+					branch="${branch//[[:space:]]/}"
+					;;
+			esac
+		done <"${file}"
+		if [[ -n "${app}" ]]; then
+			printf '%s %s\n' "${app}" "${branch}"
+		fi
+	done
+}
+
+while read -r app branch; do
+	[[ -n "${app}" ]] || continue
+	echo "Installing flatpak: ${app}//${branch}"
+	flatpak install --system --noninteractive --or-update \
+		"${app}//${branch}" ||
+		echo "WARNING: failed to install ${app}, continuing"
+done < <(parse_preinstall)
+
+echo "Flatpak preinstall complete."
