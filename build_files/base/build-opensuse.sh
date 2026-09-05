@@ -46,7 +46,7 @@ printf '[Match]\nType=ether\n\n[Network]\nDHCP=yes\n' > /etc/systemd/network/20-
 
 sed -i 's|^HOME=.*|HOME=/var/home|' /etc/default/useradd || true
 
-rm -rf /{boot,home,root,srv,mnt,var,usr/local,opt}
+rm -rf /{boot,home,root,srv,mnt,usr/local,opt}
 
 mkdir -p /sysroot /boot /usr/lib/ostree /var /var/tmp
 

@@ -178,11 +178,10 @@ sed -i 's|^HOME=.*|HOME=/var/home|' /etc/default/useradd
 mkdir -p /usr/lib/sysimage
 if [ -d /var/lib/dpkg ]; then cp -a /var/lib/dpkg /usr/lib/sysimage/dpkg; fi
 
-rm -rf /var/lib/dpkg
 mkdir -p /var/lib
 ln -sfnT ../../usr/lib/sysimage/dpkg /var/lib/dpkg
 
-rm -rf /{boot,home,root,srv,mnt,var,usr/local,opt}
+rm -rf /{boot,home,root,srv,mnt,usr/local,opt}
 
 mkdir -p /sysroot /boot /usr/lib/ostree /var /var/lib
 

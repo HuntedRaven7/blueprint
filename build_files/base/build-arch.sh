@@ -18,7 +18,7 @@ if ! grep -q '^\[multilib\]' /etc/pacman.conf; then
 fi
 
 # Build against the stock pacman layout first: archlinux:latest ships its
-# installed packages tracked in /var/lib/pacman, so /var paths must stay in
+# installed packages tracked in /mar/lib/pacman, so /var paths must stay in
 # place until after every pacman operation.
 mkdir -p /sysroot
 
@@ -140,7 +140,7 @@ sed -i -e 's|^#DBPath[[:space:]]*=[[:space:]]*/var/lib/pacman/|DBPath = /usr/lib
        -e 's|^#CacheDir[[:space:]]*=[[:space:]]*/var/cache/pacman/pkg/|CacheDir = /usr/lib/sysimage/cache/pacman/pkg/|' \
        /etc/pacman.conf
 
-rm -rf /{boot,home,root,srv,mnt,var,usr/local}
+rm -rf /{boot,home,root,srv,mnt,usr/local}
 
 rm -rf /usr/lib/sysimage/{log,cache/pacman/pkg}
 
