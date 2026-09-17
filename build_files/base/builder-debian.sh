@@ -14,6 +14,7 @@ apt-get install -y --no-install-recommends \
     libzstd-dev \
     pkgconf \
     libostree-dev \
+    libclang-dev \
     ostree
 
 export CARGO_HOME=/tmp/rust
