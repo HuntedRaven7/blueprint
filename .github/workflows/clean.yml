@@ -31,10 +31,7 @@ jobs:
               "opensuse-bootc",
               "nixos-bootc",
               "ubuntu-bootc",
-              "server",
-              "aira",
-              "robin",
-              "ai"
+              "server"
             ]
           older-than: 90 days
           keep-n-tagged: 7

@@ -43,9 +43,7 @@ Use these scopes to indicate what part of the image is affected:
 - **opensuse**: openSUSE-specific changes
 - **nixos**: NixOS-specific changes
 - **ubuntu**: Ubuntu-specific changes
-- **holo-amd**: holo-amd variant changes
-- **holo-nvidia**: holo-nvidia variant changes
-- **fsdk**: FSDK BuildStream changes
+- **server**: server variant changes
 
 ## Examples
 

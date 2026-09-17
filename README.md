@@ -10,8 +10,9 @@
 
 `blueprint` builds a set of custom, container-native (bootc) OS images. Every
 flavor builds from a single parameterized root `Containerfile` (selected via
-`VARIANT`/`BASE_IMAGE` build args), and the FSDK image is built with
-BuildStream. All flavors share common build scripts and system files.
+`VARIANT`/`BASE_IMAGE` build args), except `server` which has its own
+`containerfiles/server/Containerfile`. All flavors share common build scripts
+and system files.
 
 ## Flavors
 
@@ -22,11 +23,10 @@ To use one of the listed variants below just do a `FROM ghcr.io/huntedraven7/<IN
 | arch-bootc | `Containerfile` (`VARIANT=arch`) | Arch-based |
 | debian-bootc | `Containerfile` (`VARIANT=debian`) | Debian-based |
 | gentoo-bootc | `Containerfile` (`VARIANT=gentoo`) | Gentoo-based (local build only — see `docs/GENTOO.md`) |
-| fsdk | `buildstream/` | Distroless FSDK-based (BuildStream) |
 | nixos-bootc | `Containerfile` (`VARIANT=nixos`) | NixOS-based bootc image |
 | opensuse-bootc | `Containerfile` (`VARIANT=opensuse`) | OpenSUSE Tumbleweed-based |
 | ubuntu-bootc | `Containerfile` (`VARIANT=ubuntu`) | Ubuntu 26.04-based |
-| holo-amd / holo-nvidia | `Containerfile` (`VARIANT=holo`) | GPU-specific SteamOS-like variants |
+| server | `containerfiles/server/Containerfile` | Server image with quadlets |
 
 ## Repository layout
 
@@ -37,9 +37,8 @@ blueprint/
 ├── artifacthub-repo.yml         # ArtifactHub metadata
 ├── cosign.pub                   # image signing public key
 ├── assets/                      # logos
-├── brew/                        # Homebrew bundle files
 ├── build_files/                 # build-*.sh scripts run inside the root Containerfile
-├── buildstream/                 # Everything needed for BST (Buildstream)
+├── containerfiles/server/       # server image (own Containerfile)
 ├── disk_config/                 # disk/ISO layout configs (disk.toml, iso-*.toml)
 ├── system_files/                # files copied into the image (global + per-flavor)
 ```

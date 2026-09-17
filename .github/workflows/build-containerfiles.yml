@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [server, aira, ai]
+        variant: [server]
 
     steps:
       - name: Prepare environment
@@ -109,7 +109,7 @@ jobs:
           sudo -E "$(command -v just)" build-containerfile "${TARGET_IMAGE}" "${DEFAULT_TAG}"
 
       - name: Rechunk with Chunkah
-        if: matrix.variant != 'ai' && (steps.detect-changes.outputs.should_build == 'true' || github.event_name != 'pull_request')
+        if: steps.detect-changes.outputs.should_build == 'true' || github.event_name != 'pull_request'
         id: rechunk
         run: |
           sudo -E "$(command -v just)" rechunk \

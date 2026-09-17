@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Open AI Sandbox
-Exec=/usr/bin/container-launch ai
-Icon=applications-terminal
-NoDisplay=true
-X-KDE-Shortcuts=Ctrl+Alt+N

@@ -1,7 +1,7 @@
-# Unified Containerfile for the "other" blueprint images:
-#   arch, debian, ubuntu, opensuse, gentoo, nixos, holo-amd, holo-nvidia, robin
+# Unified Containerfile for the blueprint images:
+#   arch, debian, ubuntu, opensuse, gentoo, nixos
 #
-# robin, aira, server, crmy, ai keep their own containerfiles/Containerfile.<variant>.
+# server keeps its own containerfiles/server/Containerfile.
 #
 # Select the target and base with build args (the Justfile `build` recipe does
 # this for you):
@@ -34,8 +34,6 @@ COPY system_files/global /system_files/global
 COPY system_files/${VARIANT} /system_files/${VARIANT}
 
 # Builder stage: compile bootc (and friends) from source for the distro.
-# For "derived" images (holo-*) this is a no-op; the real work happens in the
-# system stage via BUILD_SCRIPT.
 FROM ${BASE_IMAGE} AS builder
 ARG BUILDER_SCRIPT
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \

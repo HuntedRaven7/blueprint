@@ -9,7 +9,7 @@ sed -i 's/^#Include = \/etc\/pacman.conf.d\/\*.conf/Include = \/etc\/pacman.conf
 # Enable the multilib repository (32-bit compatibility libraries on x86_64).
 # Recent archlinux base images no longer ship a commented [multilib] section,
 # so the old uncomment-only sed was a no-op. Use a robust check-and-append
-# approach (matching the holo build scripts).
+# approach.
 if ! grep -q '^\[multilib\]' /etc/pacman.conf; then
     sed -i '/^#\[multilib\]/s/^#//' /etc/pacman.conf
     if ! grep -q '^\[multilib\]' /etc/pacman.conf; then

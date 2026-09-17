@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Open Review Container
-Exec=/usr/bin/container-launch review
-Icon=applications-terminal
-NoDisplay=true
-X-KDE-Shortcuts=Ctrl+Alt+R

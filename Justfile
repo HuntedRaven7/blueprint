@@ -168,33 +168,6 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
             REPO_ORGANIZATION="huntedraven7"
             BIB_IMAGE="quay.io/centos-bootc/bootc-image-builder:latest"
             ;;
-        holo-amd*)
-            IMAGE_NAME="blueprint"
-            DEFAULT_TAG="holo-amd"
-            IMAGE_DESC="Arch Linux Gaming Bootc Image (AMD)"
-            IMAGE_KEYWORDS="bootc,oci,linux,arch,gaming,kde,steam,amd"
-            IMAGE_LOGO_URL="https://avatars.githubusercontent.com/u/120078124?s=200&v=4"
-            REPO_ORGANIZATION="huntedraven7"
-            BIB_IMAGE="quay.io/centos-bootc/bootc-image-builder:latest"
-            ;;
-        holo-nvidia*)
-            IMAGE_NAME="blueprint"
-            DEFAULT_TAG="holo-nvidia"
-            IMAGE_DESC="Arch Linux Gaming Bootc Image (NVIDIA)"
-            IMAGE_KEYWORDS="bootc,oci,linux,arch,gaming,kde,steam,nvidia"
-            IMAGE_LOGO_URL="https://avatars.githubusercontent.com/u/120078124?s=200&v=4"
-            REPO_ORGANIZATION="huntedraven7"
-            BIB_IMAGE="quay.io/centos-bootc/bootc-image-builder:latest"
-            ;;
-        robin*)
-            IMAGE_NAME="robin"
-            DEFAULT_TAG="testing"
-            IMAGE_DESC="Arch Linux Niri + Quickshell Desktop"
-            IMAGE_KEYWORDS="bootc,oci,linux,arch,niri,quickshell,wayland"
-            IMAGE_LOGO_URL="https://avatars.githubusercontent.com/u/120078124?s=200&v=4"
-            REPO_ORGANIZATION="huntedraven7"
-            BIB_IMAGE="quay.io/centos-bootc/bootc-image-builder:latest"
-            ;;
         *)
             echo "Unknown variant: '${target_image}'. No inline identity and no env file." >&2
             exit 1
@@ -236,12 +209,6 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
                 _base="gentoo/stage3:systemd"; _sys="gentoo"; _b="builder-gentoo.sh"; _s="build-gentoo.sh" ;;
             nixos)
                 _base="nixos/nix:latest"; _sys="nixos"; _b="builder-nixos.sh"; _s="build-nixos.sh" ;;
-            holo-amd)
-                _base="arch-bootc:stable"; _sys="holo"; _b="holo/builder-holo-amd.sh"; _s="holo/build-amd.sh" ;;
-            holo-nvidia)
-                _base="arch-bootc:stable"; _sys="holo"; _b="holo/builder-holo-nvidia.sh"; _s="holo/build-nvidia.sh" ;;
-            robin)
-                _base="ghcr.io/huntedraven7/arch-bootc:testing"; _sys="robin"; _b="builder-robin.sh"; _s="build-robin.sh" ;;
         esac
         BUILD_ARGS+=("--build-arg" "VARIANT=${_sys}")
         BUILD_ARGS+=("--build-arg" "BASE_IMAGE=${_base}")
@@ -279,13 +246,6 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
 
     podman build "${PODMAN_BUILD_ARGS[@]}" .
 
-# Build the fsdk image using BuildStream (pure FSDK composition, no apt)
-[group('Build')]
-build-fsdk $tag="fsdk":
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd buildstream && just build
-
 # Build images from containerfiles/ subdirectories
 [group('Build')]
 build-containerfile $target_image="" $tag="stable":
@@ -319,16 +279,13 @@ build-containerfile $target_image="" $tag="stable":
 build-all:
     #!/usr/bin/env bash
     set -euo pipefail
+    just build arch
     just build debian
+    just build opensuse
     just build ubuntu
+    just build gentoo
     just build nixos
-    just build holo-amd
-    just build holo-nvidia
-    just build-fsdk
-    just build-containerfile robin
     just build-containerfile server
-    just build-containerfile aira
-    just build-containerfile ai
 
 # Build an image then rechunk it for smaller bootc delta updates
 build-rechunked $target_image=image_name $tag=default_tag: && (rechunk target_image tag)
@@ -413,7 +370,7 @@ generate-build-tags $target_image=image_name $tag=default_tag:
     set -eoux pipefail
 
     # All alias tags are prefixed with the variant tag so variants sharing an
-    # image name (e.g. blueprint:latest, blueprint:holo-amd) never overwrite each other
+    # image name never overwrite each other
     DATE=$(date +%Y%m%d)
     BUILD_TAGS=()
     if [[ -z "$(git status -s)" ]]; then
@@ -465,9 +422,9 @@ list-images:
         [[ -f "${env}" ]] || continue
         stem="${env#images/}"
         stem="${stem%.env}"
-        if [[ -f "containerfiles/Containerfile.${stem}" ]] || [[ -f "buildstream/Containerfile.${stem}" ]]; then
+        if [[ -f "containerfiles/Containerfile.${stem}" ]]; then
             case "${stem}" in
-                arch|arch-bootc|debian-bootc|holo-amd|holo-nvidia|ai|debian|gentoo|opensuse|opensuse-bootc|ubuntu|nixos|fsdk) continue ;;
+                arch|arch-bootc|debian-bootc|debian|gentoo|opensuse|opensuse-bootc|ubuntu|nixos) continue ;;
             esac
             IMAGES+=("${stem}")
         fi
@@ -490,13 +447,7 @@ variant-env $target_image=image_name:
         gentoo*)      IMAGE_NAME="blueprint";    DEFAULT_TAG="gentoo" ;;
         nixos*)       IMAGE_NAME="nixos-bootc";  DEFAULT_TAG="testing" ;;
         ubuntu*)      IMAGE_NAME="ubuntu-bootc"; DEFAULT_TAG="testing" ;;
-        holo-amd*)    IMAGE_NAME="blueprint";    DEFAULT_TAG="holo-amd" ;;
-        holo-nvidia*) IMAGE_NAME="blueprint";    DEFAULT_TAG="holo-nvidia" ;;
-        robin*)       IMAGE_NAME="robin";        DEFAULT_TAG="testing" ;;
-        fsdk*)        IMAGE_NAME="blueprint";    DEFAULT_TAG="fsdk" ;;
         server*)      IMAGE_NAME="server";       DEFAULT_TAG="testing" ;;
-        aira*)        IMAGE_NAME="aira";         DEFAULT_TAG="testing" ;;
-        ai*)          IMAGE_NAME="ai";           DEFAULT_TAG="testing" ;;
         *)
             echo "Unknown variant: '${target_image}'" >&2
             exit 1
@@ -614,10 +565,6 @@ build-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_build
 # Build an ISO virtual machine image
 [group('Build Virtal Machine Image')]
 build-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_build-bib target_image tag "iso" "disk_config/iso.toml")
-
-# Build an installer ISO using bootc-installer
-[group('Build Virtal Machine Image')]
-build-iso-kde: && (_rebuild-bib "ghcr.io/huntedraven7/blueprint" "robin" "iso" "disk_config/iso-kde.toml")
 
 # Build a server installer ISO using BIB (Anaconda-based)
 [group('Build Virtal Machine Image')]

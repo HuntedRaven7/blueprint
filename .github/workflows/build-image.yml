@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [arch, debian, opensuse, nixos, ubuntu, holo-amd, holo-nvidia, fsdk, robin]
+        variant: [arch, debian, opensuse, nixos, ubuntu, gentoo]
 
     steps:
       - name: Prepare environment
@@ -90,7 +90,6 @@ jobs:
               - 'Justfile'
               - 'build_files/**'
               - 'system_files/**'
-              - 'buildstream/**'
               - 'disk_config/**'
 
       - name: Resolve variant identity
@@ -114,21 +113,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           image-name: ${{ env.IMAGE_NAME }}
 
-      - name: Pull arch base for holo variants
-        if: startsWith(matrix.variant, 'holo-')
-        run: |
-          set -euo pipefail
-          REGISTRY="${IMAGE_REGISTRY,,}"
-          sudo -E podman pull "${REGISTRY}/arch-bootc:stable" || true
-          IMAGE_ID=$(sudo -E podman images --filter reference="${REGISTRY}/arch-bootc:stable" --format '{{.ID}}' | head -n1)
-          if [[ -z "${IMAGE_ID}" ]]; then
-            echo "Arch stable image not found in registry, building locally..."
-            sudo -E "$(command -v just)" build arch
-            sudo -E podman tag "arch-bootc:testing" "arch-bootc:stable"
-          else
-            sudo -E podman tag "${IMAGE_ID}" "arch-bootc:stable"
-           fi
-
       - name: Build image
         id: build-image
         if: steps.detect-changes.outputs.should_build == 'true' || github.event_name != 'pull_request'
@@ -136,14 +120,10 @@ jobs:
           TARGET_IMAGE: ${{ matrix.variant }}
         run: |
           set -euo pipefail
-          if [[ "${TARGET_IMAGE}" == "fsdk" ]]; then
-            sudo -E env "PATH=${PATH}" "$(command -v just)" build-fsdk
-          else
-            sudo -E "$(command -v just)" build "${TARGET_IMAGE}"
-          fi
+          sudo -E "$(command -v just)" build "${TARGET_IMAGE}"
 
       - name: Rechunk with Chunkah
-        if: matrix.variant != 'fsdk' && (steps.detect-changes.outputs.should_build == 'true' || github.event_name != 'pull_request')
+        if: steps.detect-changes.outputs.should_build == 'true' || github.event_name != 'pull_request'
         id: rechunk
         run: |
           sudo -E "$(command -v just)" rechunk \
