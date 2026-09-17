@@ -17,6 +17,10 @@ if ! grep -q '^\[multilib\]' /etc/pacman.conf; then
     fi
 fi
 
+# Add the SELinux repo, until upstream will make SELinux optional.
+# https://github.com/bootc-dev/bootc/issues/2431
+echo -e "[selinux]\nServer = https://github.com/archlinuxhardened/selinux/releases/download/ArchLinux-SELinux\nSigLevel = Never" >> /etc/pacman.conf
+
 # Build against the stock pacman layout first: archlinux:latest ships its
 # installed packages tracked in /mar/lib/pacman, so /var paths must stay in
 # place until after every pacman operation.
@@ -52,6 +56,7 @@ PACKAGES=(
     sudo
     systemd
     udev
+    libselinux
 )
 
 pacman -S --noconfirm --needed "${PACKAGES[@]}"
