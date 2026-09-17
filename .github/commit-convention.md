@@ -43,7 +43,6 @@ Use these scopes to indicate what part of the image is affected:
 - **opensuse**: openSUSE-specific changes
 - **nixos**: NixOS-specific changes
 - **ubuntu**: Ubuntu-specific changes
-- **server**: server variant changes
 
 ## Examples
 

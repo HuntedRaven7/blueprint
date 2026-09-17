@@ -174,8 +174,7 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
             ;;
     esac
 
-    # Every variant builds from the single root `Containerfile`; the per-variant
-    # containerfiles/Containerfile.<variant> files no longer exist.
+    # Every variant builds from the single root `Containerfile`.
     CONTAINERFILE="Containerfile"
 
     TAG="${DEFAULT_TAG}"
@@ -246,34 +245,6 @@ build $target_image="" $tag="" $dx="0" $kernel_pin="" $gnome_version="50" $major
 
     podman build "${PODMAN_BUILD_ARGS[@]}" .
 
-# Build images from containerfiles/ subdirectories
-[group('Build')]
-build-containerfile $target_image="" $tag="stable":
-    #!/usr/bin/env bash
-    set -euo pipefail
-    CONTAINERFILE_DIR="containerfiles/${target_image}"
-    if [[ ! -d "${CONTAINERFILE_DIR}" ]]; then
-        echo "No containerfile directory found for ${target_image}" >&2
-        exit 1
-    fi
-    cd "${CONTAINERFILE_DIR}"
-    CONTAINERFILE="Containerfile"
-    if [[ ! -f "${CONTAINERFILE}" ]]; then
-        CONTAINERFILE="Containerfile.${target_image}"
-    fi
-    if [[ ! -f "${CONTAINERFILE}" ]]; then
-        echo "No Containerfile found in ${CONTAINERFILE_DIR}" >&2
-        exit 1
-    fi
-    podman build \
-        --build-arg "IMAGE_NAME=${target_image}" \
-        --build-arg "UBLUE_IMAGE_TAG=${tag}" \
-        --pull=newer \
-        --no-cache \
-        --tag "${target_image}:${tag}" \
-        --file "${CONTAINERFILE}" \
-        .
-
 # Build all images in the repo
 [group('Build')]
 build-all:
@@ -285,7 +256,6 @@ build-all:
     just build ubuntu
     just build gentoo
     just build nixos
-    just build-containerfile server
 
 # Build an image then rechunk it for smaller bootc delta updates
 build-rechunked $target_image=image_name $tag=default_tag: && (rechunk target_image tag)
@@ -447,7 +417,6 @@ variant-env $target_image=image_name:
         gentoo*)      IMAGE_NAME="blueprint";    DEFAULT_TAG="gentoo" ;;
         nixos*)       IMAGE_NAME="nixos-bootc";  DEFAULT_TAG="testing" ;;
         ubuntu*)      IMAGE_NAME="ubuntu-bootc"; DEFAULT_TAG="testing" ;;
-        server*)      IMAGE_NAME="server";       DEFAULT_TAG="testing" ;;
         *)
             echo "Unknown variant: '${target_image}'" >&2
             exit 1
@@ -566,17 +535,6 @@ build-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_build
 [group('Build Virtal Machine Image')]
 build-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_build-bib target_image tag "iso" "disk_config/iso.toml")
 
-# Build a server installer ISO using BIB (Anaconda-based)
-[group('Build Virtal Machine Image')]
-build-server-iso: (build-containerfile "server") && (_build-bib "ghcr.io/huntedraven7/blueprint" "server" "iso" "disk_config/iso-server.toml")
-
-# Build the ncurses server installer ISO (uses lorax/livemedia-creator)
-[group('Build Virtal Machine Image')]
-build-installer-iso:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    just sudoif bash installer/build-installer-iso.sh
-
 # Rebuild a QCOW2 virtual machine image
 [group('Build Virtal Machine Image')]
 rebuild-qcow2 $target_image=("localhost/" + image_name) $tag=default_tag: && (_rebuild-bib target_image tag "qcow2" "disk_config/disk.toml")
@@ -642,51 +600,6 @@ run-vm-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-
 # Run a virtual machine from an ISO
 [group('Run Virtal Machine')]
 run-vm-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-vm target_image tag "iso" "disk_config/iso.toml")
-
-# Run the server installer ISO in a VM
-[group('Run Virtal Machine')]
-run-server-iso: && (_run-vm "localhost/blueprint" "server" "iso" "disk_config/iso-server.toml")
-
-# Run the ncurses installer ISO in a VM
-[group('Run Virtal Machine')]
-run-installer-iso:
-    #!/usr/bin/env bash
-    set -eoux pipefail
-
-    ISO_FILE="output/installer-iso/blueprint-server-installer-$(date +%Y%m%d).iso"
-    if [[ ! -f "$ISO_FILE" ]]; then
-        # Try to find any installer ISO
-        ISO_FILE=$(find output/installer-iso -name "*.iso" -type f 2>/dev/null | head -1)
-    fi
-
-    if [[ -z "$ISO_FILE" ]] || [[ ! -f "$ISO_FILE" ]]; then
-        echo "No installer ISO found. Building first..."
-        just build-installer-iso
-        ISO_FILE="output/installer-iso/blueprint-server-installer-$(date +%Y%m%d).iso"
-    fi
-
-    port=8006
-    while grep -q :${port} <<< $(ss -tunalp); do
-        port=$(( port + 1 ))
-    done
-    echo "Using Port: ${port}"
-    echo "Connect to http://localhost:${port}"
-
-    run_args=()
-    run_args+=(--rm --privileged)
-    run_args+=(--pull=newer)
-    run_args+=(--publish "127.0.0.1:${port}:8006")
-    run_args+=(--env "CPU_CORES=4")
-    run_args+=(--env "RAM_SIZE=8G")
-    run_args+=(--env "DISK_SIZE=64G")
-    run_args+=(--env "TPM=Y")
-    run_args+=(--env "GPU=Y")
-    run_args+=(--device=/dev/kvm)
-    run_args+=(--volume "${PWD}/${ISO_FILE}:/boot.iso")
-    run_args+=(docker.io/qemux/qemu)
-
-    (sleep 30 && xdg-open http://localhost:"$port") &
-    podman run "${run_args[@]}"
 
 # Run a virtual machine using systemd-vmspawn
 [group('Run Virtal Machine')]

@@ -14,10 +14,9 @@ links lives in `.agents/skills/README.md`.
 `huntedraven7`. It is not a fork-this-template project: there is one repository
 that builds a set of image variants — `arch`, `debian`, `ubuntu`, `opensuse`,
 `gentoo`, `nixos` (all from a single unified root `Containerfile`, with
-identity inlined in the `Justfile` `build` recipe `case` arms) plus `server`
-(with its own `containerfiles/server/Containerfile`) — and three promoted base
-images (`arch-bootc`, `debian-bootc`, `opensuse-bootc`). The `Justfile` is the
-single build entrypoint.
+identity inlined in the `Justfile` `build` recipe `case` arms) — and three
+promoted base images (`arch-bootc`, `debian-bootc`, `opensuse-bootc`). The
+`Justfile` is the single build entrypoint.
 
 ## Branch Strategy
 

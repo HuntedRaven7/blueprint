@@ -1,8 +1,6 @@
 # Unified Containerfile for the blueprint images:
 #   arch, debian, ubuntu, opensuse, gentoo, nixos
 #
-# server keeps its own containerfiles/server/Containerfile.
-#
 # Select the target and base with build args (the Justfile `build` recipe does
 # this for you):
 #   --build-arg VARIANT=<name>          system_files dir + default script stem

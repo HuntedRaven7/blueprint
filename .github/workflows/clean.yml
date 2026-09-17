@@ -30,8 +30,7 @@ jobs:
               "debian-bootc",
               "opensuse-bootc",
               "nixos-bootc",
-              "ubuntu-bootc",
-              "server"
+              "ubuntu-bootc"
             ]
           older-than: 90 days
           keep-n-tagged: 7
