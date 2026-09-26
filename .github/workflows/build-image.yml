@@ -74,7 +74,7 @@ jobs:
         uses: ublue-os/remove-unwanted-software@695eb75bc387dbcd9685a8e72d23439d8686cba6
 
       - name: Setup runner
-        uses: projectbluefin/actions/bootc-build/setup-runner@837850b6100b22c7920476035e7e1c28fdbba67f # v1
+        uses: projectbluefin/actions/bootc-build/setup-runner@f862ab6946fb10e5566bfda8336fd58cedb3b9c3 # v1
         with:
           storage-backend: remove-software
           update-podman: true
@@ -82,7 +82,7 @@ jobs:
 
       - name: Detect changes
         id: detect-changes
-        uses: projectbluefin/actions/bootc-build/detect-changes@837850b6100b22c7920476035e7e1c28fdbba67f # v1
+        uses: projectbluefin/actions/bootc-build/detect-changes@f862ab6946fb10e5566bfda8336fd58cedb3b9c3 # v1
         with:
           filters: |
             image:
@@ -107,7 +107,7 @@ jobs:
 
       - name: Preflight
         id: preflight
-        uses: projectbluefin/actions/bootc-build/preflight@837850b6100b22c7920476035e7e1c28fdbba67f # v1
+        uses: projectbluefin/actions/bootc-build/preflight@f862ab6946fb10e5566bfda8336fd58cedb3b9c3 # v1
         with:
           registry: ghcr.io
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -179,7 +179,7 @@ jobs:
         id: push-image
         env:
           ALIAS_TAGS: ${{ steps.gen-build-tags.outputs.alias_tags }}
-        uses: projectbluefin/actions/bootc-build/push-image@837850b6100b22c7920476035e7e1c28fdbba67f # v1
+        uses: projectbluefin/actions/bootc-build/push-image@f862ab6946fb10e5566bfda8336fd58cedb3b9c3 # v1
         with:
           image-name: ${{ env.IMAGE_NAME }}
           tags: ${{ steps.gen-build-tags.outputs.alias_tags }}
